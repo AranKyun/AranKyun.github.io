@@ -1,1 +1,166 @@
-Hello World
+<html >
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js">
+        </script>
+         <script type="text/javascript" src="http://files.cnblogs.com/dachie/jquery.timers-1.2.js"></script>
+        <style>
+            .body {
+                width: 100%;
+                padding: 0;
+            }
+
+            .shadow {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                border-radius: 5px;
+                box-shadow: 0px 0px 10px rgba(0,0,0,0.8) inset;
+                z-index: 4;
+            }
+
+            .highlight {
+                position: absolute;
+                width: 100%;
+                height: 35%;
+                background-color: rgba(255, 255, 255, 0.3);
+                z-index: 2;
+            }
+
+            .bar {
+                position:absolute;
+                height: 100%;
+                background: linear-gradient(to right, rgb(27, 82, 4) , rgb(113, 168, 46));
+                z-index: 1;
+            }
+
+            .bar-me {
+                position:absolute;
+                height: 100%;
+                background: linear-gradient(to right, rgb(119, 58, 5) , rgb(214, 143, 58));
+                z-index: 1;
+            }
+
+            .label {
+                position: absolute;
+                display: table;
+                z-index: 3;
+                width: 100%;
+                height: 100%;
+            }
+            .label div.right{
+                display: table-cell;
+                vertical-align: middle;
+                text-align: right;
+                color: white;
+                text-shadow: 0px 0px 3px rgb(219, 178, 117);
+                padding-right: 5px;
+            }
+            .label div.left{
+                display: table-cell;
+                vertical-align: middle;
+                text-align: left;
+                color: white;
+                text-shadow: 0px 0px 3px rgb(219, 178, 117);
+                padding-left: 5px;
+            }
+
+            .title {
+                padding-left: 10px;
+                color: white;
+                font-family: Arial, "Microsoft Yahei";
+                text-shadow: 0px 0px 5px rgb(7, 72, 100);
+            }
+
+            .container {
+                width: 100%;
+            }
+            .container td.icon {
+                height: 30px;
+                width: fit-content;
+            }
+            .container td.icon img {
+                height: 100%;
+            }
+            .container td.progress {
+                width: 100%;
+            }
+            .container td.progress div.box {
+                position: relative;
+                font-family: Arial, "Microsoft Yahei";
+                background-color: rgb(43, 27, 19);
+                height: 26px;
+                width: 100%;
+                border-radius: 5px;
+                font-size: 13px;
+                border: 1px solid rgb(219, 178, 117);
+                overflow: hidden;
+                box-shadow: 0px 0px 5px rgba(0,0,0,0.5)
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+
+                var lastUpdate = Date.now();
+
+                $('body').everyTime('1s', 'loop', function(){
+                    if (Date.now() - lastUpdate > 5000) {
+                        $('.title').hide();
+                        $('.container').hide();
+                    }
+                    else {
+                        $('.title').show();
+                        $('.container').show();
+                    }
+                })
+
+                document.addEventListener("onOverlayDataUpdate", function(e){
+                    update(e.detail);
+                });
+
+                function update(data) {
+                    lastUpdate = Date.now();
+                    updateCombatantList(data);
+                }
+
+                function updateCombatantList(data) {
+                    $('.title').text(data.Encounter.title);
+                    var maxdamage = data.Combatant[Object.keys(data.Combatant)[0]]['damage'];
+
+                    $('.container').empty();
+
+                    for (var combatantName in data.Combatant) {
+                        var combatant = data.Combatant[combatantName];
+                        var damage = combatant['damage'];
+                        var dps = combatant['dps'];
+                        var job = combatant['Job'];
+
+                        $('.container').append(
+                            '<tr> \
+                <td class="icon"><img src="jobs/' + (job == '' ? 'limitbreak' : job) + '.png"></td>\
+                <td class="progress">\
+                    <div class="box">\
+                        <div class="shadow"></div>\
+                        <div class="' + (combatantName == 'YOU' ? 'bar-me' : 'bar') + '" style="width: '+ damage * 100.0 / maxdamage + '%"></div>\
+                        <div class="highlight"></div>\
+                        <div class="label">\
+                            <div class="left">' + combatantName +'</div>\
+                            <div class="right">' + dps + '/秒' + '</div>\
+                        </div>\
+                    </div>\
+                </td>\
+            </tr>'
+                        );
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <div class="title">ABC</div>
+        <table class="container">
+            
+        </table>
+    </body>
+</html>
